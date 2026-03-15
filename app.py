@@ -14,7 +14,7 @@ NAMESPACE = "ns2500"
 
 # Page setup
 st.set_page_config(page_title="ML Expert - AI Assistant")
-st.title("🤖 ML Expert")
+st.markdown("<h1 style='text-align: center;'>🤖 ML Expert</h1>", unsafe_allow_html=True)
 
 # Get API keys from secrets
 try:

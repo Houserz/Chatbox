@@ -13,8 +13,8 @@ INDEX_NAME = "mini2"
 NAMESPACE = "ns2500"
 
 # Page setup
-st.set_page_config(page_title="Mini Project 3 - Multi-Agent Chatbot")
-st.title("Mini Project Part 3: Multi-Agent Chatbot")
+st.set_page_config(page_title="ML Expert - AI Assistant")
+st.title("🤖 ML Expert")
 
 # Get API keys from secrets
 try:

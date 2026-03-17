@@ -7,17 +7,18 @@ class Context_Rewriter_Agent:
         self.client = openai_client
         self.deployment = deployment
         self.prompt = (
-            "Your ONLY job is to replace pronouns and abbreviations in the user's query. Make MINIMAL changes.\n"
-            "RULES:\n"
-            "1. If the query contains pronouns (it, they, this, that), replace them with the concrete topic from conversation history\n"
-            "2. If the query contains abbreviations/acronyms, expand them to full form (without keeping abbreviation in parentheses)\n"
-            "3. Keep the original sentence structure and wording - do NOT rephrase or rewrite the entire question\n"
-            "4. If the query is too vague or incomplete (single word like 'what', 'ok', 'see'), return it UNCHANGED\n"
-            "Examples:\n"
-            "- 'Why is it important?' (after cross-validation) -> 'Why is cross-validation important?'\n"
-            "- 'What is SVM?' -> 'What is Support Vector Machine?'\n"
-            "- 'what' -> 'what' (unchanged)\n"
-            "- 'How does it work?' (after neural networks) -> 'How do neural networks work?'\n"
+            "Your task: Make the query self-contained by replacing unclear references with specific terms from conversation history.\n\n"
+            "ONLY modify the query if it contains:\n"
+            "- Pronouns that refer to previous topics: 'it', 'they', 'this', 'that', 'these', 'those'\n"
+            "- Explicit references to previous conversation: 'you mentioned', 'you said', 'earlier answer', 'based on your answer'\n"
+            "- Unclear abbreviations that need expansion\n\n"
+            "If the query has none of these, return it UNCHANGED.\n\n"
+            "When modifying:\n"
+            "- Make MINIMAL changes - only replace the unclear reference\n"
+            "- Keep the original sentence structure, tone, and question format\n"
+            "- Do NOT rephrase, reorganize, or change the meaning\n"
+            "- Do NOT add extra context beyond what's needed to clarify the reference\n\n"
+            "Output only the query, nothing else."
         )
 
     def rephrase(self, user_history, latest_query):

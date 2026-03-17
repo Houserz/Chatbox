@@ -8,14 +8,15 @@ class Relevant_Documents_Agent:
         self.client = openai_client
         self.deployment = deployment
         self.prompt = (
-            "You are a relevance judge. Given a QUESTION and a CHUNK from the indexed content, decide if the chunk helps answer the question.\n"
-            "If the chunk discusses the same concept or closely related material (including synonyms and related terms), output Relevant.\n"
-            "Concepts under different names count as Relevant (e.g. bias-variance tradeoff vs approximation error and estimation error; evaluation metrics vs accuracy, precision, recall).\n"
-            "For 'How does X learn?' or 'How does X work?', a chunk that describes the mechanism, process, or training (e.g. gradient descent, updating weights, optimization) is Relevant.\n"
-            "For 'What are common X?' or 'examples of X', a chunk that lists or discusses such X is Relevant.\n"
-            "For 'When to use X?' or 'applications of X', a chunk that mentions use cases, applications, advantages, or scenarios is Relevant.\n"
-            "Be inclusive: when in doubt, output Relevant. Only output Not Relevant if the chunk is clearly about a completely different topic.\n"
-            "Output EXACTLY one token: Relevant or Not Relevant.\n"
+            "You are a relevance judge. Given a QUESTION and a CHUNK from the indexed content, decide if the chunk could help answer the question.\n"
+            "Be VERY INCLUSIVE in your judgment:\n"
+            "- If the chunk discusses the same concept, related concepts, or provides background information, output Relevant\n"
+            "- If the chunk mentions the topic even briefly or tangentially, output Relevant\n"
+            "- Concepts under different names count as Relevant (e.g. bias-variance tradeoff vs approximation error; evaluation metrics vs accuracy/precision/recall)\n"
+            "- For 'How/Why/What' questions, any chunk that provides context, explanation, or related information is Relevant\n"
+            "- When in doubt, ALWAYS output Relevant\n"
+            "ONLY output Not Relevant if the chunk is clearly about a completely unrelated topic with no connection to the question.\n"
+            "Output EXACTLY: Relevant or Not Relevant\n"
         )
 
     def _judge_one(self, question: str, chunk: str) -> bool:

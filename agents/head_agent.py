@@ -113,10 +113,20 @@ class Head_Agent:
                 "docs": [],
             }
 
-        # Skip strict relevance check - trust vector search results
-        # If we retrieved docs, assume they're relevant enough to attempt an answer
+        # 6) Check if retrieved docs are actually relevant
+        relevance = self.relevant_docs_agent.get_relevance(rewritten, docs)
+        if relevance == "Not Relevant":
+            return {
+                "final_stream": None,
+                "final_text": self.NOT_RELEVANT_MESSAGE,
+                "is_obnoxious": False,
+                "is_relevant": False,
+                "is_greeting": False,
+                "rewritten_query": rewritten,
+                "docs": docs,
+            }
 
-        # 6) Answer using docs (stream)
+        # 7) Answer using docs (stream)
         stream = self.answering_agent.generate_stream(rewritten, docs, history, k=k)
         return {
             "final_stream": stream,

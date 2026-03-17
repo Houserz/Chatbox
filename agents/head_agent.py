@@ -101,12 +101,8 @@ class Head_Agent:
         # 4) Retrieve (use at least 7 chunks to improve relevance-judge coverage)
         docs = self.query_agent.query_vector_store(rewritten, k=max(k, 7))
 
-        # 5) Relevance check over retrieved docs
-        preview = "\n\n".join([f"Chunk {i+1}:\n{truncate(d.text, 900)}" for i, d in enumerate(docs[:3])])
-        rel_in = f"Question:\n{safe_text(rewritten)}\n\nRetrieved chunks:\n{preview}"
-        rel = self.relevant_docs_agent.get_relevance(rewritten, docs)
-
-        if rel == "Not Relevant":
+        # 5) If no docs retrieved, return not relevant
+        if not docs:
             return {
                 "final_stream": None,
                 "final_text": self.NOT_RELEVANT_MESSAGE,
@@ -114,8 +110,11 @@ class Head_Agent:
                 "is_relevant": False,
                 "is_greeting": False,
                 "rewritten_query": rewritten,
-                "docs": docs,
+                "docs": [],
             }
+
+        # Skip strict relevance check - trust vector search results
+        # If we retrieved docs, assume they're relevant enough to attempt an answer
 
         # 6) Answer using docs (stream)
         stream = self.answering_agent.generate_stream(rewritten, docs, history, k=k)

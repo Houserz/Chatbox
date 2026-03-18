@@ -53,4 +53,5 @@ CONTEXT:
             ],
             stream=True,
             temperature=0.2,
+            seed=42,
         )

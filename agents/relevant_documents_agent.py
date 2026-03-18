@@ -23,6 +23,7 @@ class Relevant_Documents_Agent:
         resp = self.client.chat.completions.create(
             model=self.deployment,
             temperature=0,
+            seed=42,
             messages=[
                 {"role": "system", "content": self.prompt},
                 {"role": "user", "content": f"QUESTION:\n{question}\n\nCHUNK:\n{chunk}"},

@@ -58,32 +58,45 @@ class Query_Agent:
     def _looks_like_content_question(self, query: str) -> bool:
         """If True, prefer QUERY to avoid false NO_QUERY for substantive questions."""
         q = safe_text(query).strip()
-        if len(q) < 6:
+        if len(q) < 4:
             return False
         q_lower = q.lower()
-        # Clearly out-of-scope patterns: do not override NO_QUERY
         if any(x in q_lower for x in (
             "weather", "forecast", "restaurant", "capital city", "world cup", "coldplay",
-            "gas station", "concert", "smartphone", "factory settings", "sunflower", "library"
+            "gas station", "concert", "smartphone", "factory settings", "sunflower",
         )):
             return False
-        # Question-like: ends with ? or starts with question patterns
         if "?" in q:
             return True
-        starters = ("what", "how", "why", "explain", "describe", "can you", "when", "which", "discuss")
-        return q_lower.startswith(starters)
+        starters = (
+            "what", "how", "why", "explain", "describe", "can you", "when", "which",
+            "discuss", "is ", "are ", "does ", "do ", "could", "should", "would",
+            "tell", "define", "compare", "give", "list", "name",
+        )
+        if q_lower.startswith(starters):
+            return True
+        content_keywords = (
+            "important", "work", "mean", "difference", "example", "learn",
+            "train", "use", "apply", "affect", "impact", "relate", "help",
+        )
+        return any(kw in q_lower for kw in content_keywords)
 
-    def should_query(self, query: str) -> str:
+    def _single_should_query(self, query: str, seed: int) -> str:
         resp = self.client.chat.completions.create(
             model=self.deployment,
             temperature=0,
+            seed=seed,
             messages=[
                 {"role": "system", "content": self.prompt},
                 {"role": "user", "content": safe_text(query)},
             ],
         )
-        action = self.extract_action(resp.choices[0].message.content, query)
-        # Override: if model said NO_QUERY but query looks like a content question, use QUERY
+        return self.extract_action(resp.choices[0].message.content, query)
+
+    def should_query(self, query: str) -> str:
+        votes = [self._single_should_query(query, seed=s) for s in (42, 123, 7)]
+        query_count = sum(1 for v in votes if v == "QUERY")
+        action = "QUERY" if query_count >= 2 else "NO_QUERY"
         if action == "NO_QUERY" and self._looks_like_content_question(query):
             return "QUERY"
         return action

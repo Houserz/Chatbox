@@ -36,6 +36,7 @@ class Greeting_Agent:
         resp = self.client.chat.completions.create(
             model=self.deployment,
             temperature=0,
+            seed=42,
             messages=[
                 {"role": "system", "content": self.prompt},
                 {"role": "user", "content": safe_text(query)},
@@ -48,6 +49,7 @@ class Greeting_Agent:
         resp = self.client.chat.completions.create(
             model=self.deployment,
             temperature=0.3,
+            seed=42,
             messages=[
                 {"role": "system", "content": self.reply_prompt},
                 {"role": "user", "content": safe_text(query)},
